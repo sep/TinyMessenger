@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace TinyMessenger
@@ -134,7 +135,7 @@ namespace TinyMessenger
             if (hub == null)
                 throw new ArgumentNullException("hub");
 
-            if (!typeof(ITinyMessage).IsAssignableFrom(messageType))
+            if (!typeof(ITinyMessage).GetTypeInfo().IsAssignableFrom(messageType.GetTypeInfo()))
                 throw new ArgumentOutOfRangeException("messageType");
 
             _Hub = new WeakReference(hub);
@@ -149,7 +150,9 @@ namespace TinyMessenger
 
                 if (hub != null)
                 {
-                    var unsubscribeMethod = typeof(ITinyMessengerHub).GetMethod("Unsubscribe", new Type[] {typeof(TinyMessageSubscriptionToken)});
+                    var hubTypeInfo = typeof (ITinyMessengerHub).GetTypeInfo();
+                    var unsubscribeMethod = hubTypeInfo.GetDeclaredMethods("Unsubscribe").Single(m => m.GetParameters().Count() == 1 && 
+                                                                                               m.GetParameters().First().ParameterType == typeof(TinyMessageSubscriptionToken));
                     unsubscribeMethod = unsubscribeMethod.MakeGenericMethod(_MessageType);
                     unsubscribeMethod.Invoke(hub, new object[] {this});
                 }
@@ -412,7 +415,7 @@ namespace TinyMessenger
                 if (message == null)
                     return false;
 
-                if (!(typeof(TMessage).IsAssignableFrom(message.GetType())))
+                if (!(typeof(TMessage).GetTypeInfo().IsAssignableFrom(message.GetType().GetTypeInfo())))
                     return false;
 
                 if (!_DeliveryAction.IsAlive)
@@ -475,7 +478,7 @@ namespace TinyMessenger
                 if (message == null)
                     return false;
 
-                if (!(typeof(TMessage).IsAssignableFrom(message.GetType())))
+                if (!(typeof(TMessage).GetTypeInfo().IsAssignableFrom(message.GetType().GetTypeInfo())))
                     return false;
 
                 return _MessageFilter.Invoke(message as TMessage);
@@ -778,5 +781,17 @@ namespace TinyMessenger
         }
         #endregion
     }
+
+    public static class ListExtensions
+    {
+        public static void ForEach<T>(this List<T> target, Action<T> toDo)
+        {
+            foreach (var item in target)
+            {
+                toDo(item);
+            }
+        }
+    }
+
     #endregion
 }
