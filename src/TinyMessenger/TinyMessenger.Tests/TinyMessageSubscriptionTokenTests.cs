@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using TinyMessenger.Tests.TestData;
 using TinyMessenger;
 
 namespace TinyMessenger.Tests
 {
-    [TestClass]
+    [TestFixtureAttribute]
     public class TinyMessageSubscriptionTokenTests
     {
-        [TestMethod]
+        [TestAttribute]
         public void Dispose_WithValidHubReference_UnregistersWithHub()
         {
             var messengerMock = new Moq.Mock<ITinyMessengerHub>();
@@ -23,7 +23,7 @@ namespace TinyMessenger.Tests
             messengerMock.VerifyAll();
         }
 
-        [TestMethod]
+        [TestAttribute]
         public void Dispose_WithInvalidHubReference_DoesNotThrow()
         {
             var token = UtilityMethods.GetTokenWithOutOfScopeMessenger();
@@ -33,7 +33,7 @@ namespace TinyMessenger.Tests
             token.Dispose();
         }
 
-        [TestMethod]
+        [TestAttribute]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Ctor_NullHub_ThrowsArgumentNullException()
         {
@@ -42,7 +42,7 @@ namespace TinyMessenger.Tests
             var token = new TinyMessageSubscriptionToken(null, typeof(ITinyMessage));
         }
 
-        [TestMethod]
+        [TestAttribute]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void Ctor_InvalidMessageType_ThrowsArgumentOutOfRangeException()
         {
@@ -51,7 +51,7 @@ namespace TinyMessenger.Tests
             var token = new TinyMessageSubscriptionToken(messenger, typeof(object));
         }
 
-        [TestMethod]
+        [TestAttribute]
         public void Ctor_ValidHubAndMessageType_DoesNotThrow()
         {
             var messenger = UtilityMethods.GetMessenger();
