@@ -3,6 +3,9 @@
 //
 // A simple messenger/event aggregator.
 //
+// https://github.com/sep/TinyMessenger
+// 
+// forked from...
 // https://github.com/grumpydev/TinyMessenger
 //===============================================================================
 // Copyright © Steven Robbins.  All rights reserved.
